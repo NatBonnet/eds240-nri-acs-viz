@@ -1,0 +1,127 @@
+---
+title: "EDS 240: Visualizing FEMA NRI Data"
+format: html
+---
+
+
+Setup
+
+```{r}
+# Read in libraries
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+nri <- read.csv(here("data", "National_Risk_Index_Counties_807384124455672111.csv")) %>% 
+  clean_names() %>% 
+  filter(!state_name %in% c("District of Columbia", "American Samoa", "Guam", "Northern Mariana Islands", "Virgin Islands", "Puerto Rico")) %>% 
+  filter(county_type == "County")
+```
+
+Try to see a col plot first
+
+```{r}
+nri_state <- nri %>% 
+  group_by(state_name) %>% 
+  summarise(mean_nri = mean(national_risk_index_score_composite), 
+            pop = sum(population_2020)) %>% 
+  ungroup()
+
+ggplot(data = nri_state, aes(x = state_name, y = mean_nri))+
+  geom_col()
+```
+
+Score seems like it seriously depends on population size
+```{r}
+ggplot(data = nri_state, aes(x = pop, y = mean_nri)) +
+  geom_point()
+```
+
+Try to standardize across population size- take score divided by population size
+
+```{r}
+nri_norm <- nri %>% 
+  mutate(nri_norm = (national_risk_index_score_composite/population_2020)) %>% 
+  group_by(state_name) %>% 
+  summarise(mean_nri = mean(nri_norm))
+
+  ggplot(nri_norm, aes(x = state_name, y = mean_nri)) +
+  geom_col() +
+  theme(axis.text.x =  element_text(angle = 90, size = 5))
+# I want to show the contribution of a couple categories to the score- pull out 5 largest expected losses by state- show proportion in colors
+
+  
+```
+```{r}
+nri_norm <- nri %>% 
+  mutate(nri_norm = (national_risk_index_score_composite/population_2020),
+         loss_norm = (expected_annual_loss_total_composite/population_2020)) %>% 
+  group_by(state_name) %>% 
+  summarise(mean_nri = mean(nri_norm), 
+            mean_loss = mean(loss_norm))
+  
+ggplot(nri_norm, aes(x = state_name, y = mean_nri)) +
+  geom_col() +
+  coord_polar()+
+  theme(axis.text.x =  element_text(size = 5))
+
+
+```
+```{r}
+quantile(nri_norm$mean_loss)
+```
+population-weighted mean: sum(score * population) / sum(population)
+
+```{r}
+nri_summary <- nri %>% 
+  group_by(state_name) %>% 
+  summarise(
+    mean_nri = weighted.mean(national_risk_index_score_composite, population_2020, na.rm = TRUE),
+    mean_loss = weighted.mean(expected_annual_loss_total_composite, population_2020, na.rm = TRUE)
+  ) 
+
+library(gghighlight)
+
+ggplot(nri_summary, aes(
+  # Add columns by state, reordered by the mean NRI value calculated
+  x = reorder(state_name, mean_nri),
+  # Column height is determined by weighted mean NRI
+  y = mean_nri,
+  # Fill values by the weighted average of loss by county
+  fill = mean_loss
+)) +
+  # Use column plot
+  geom_col() +
+  coord_radial(inner.radius = 0.2, expand = FALSE) +  # larger inner circle
+  scale_fill_viridis_c(option = "magma",
+                       name = "Average Annual Loss",
+                       begin = 0.05, 
+                       end = 0.95, 
+                       labels = scales::label_dollar(scale_cut = scales::cut_short_scale())) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 0,
+      size = 6,
+      hjust = 0.5
+    ),
+    # horizontal labels
+    axis.text.y = element_blank(),
+    # remove radial ticks
+    axis.ticks.y = element_blank(),
+    # Remove gridded lines
+    panel.grid = element_blank(),
+    # blank background
+    plot.background = element_blank(),
+    # Remove panel background
+    panel.background = element_blank()
+  ) +
+  labs(title = "National Risk Index (NRI) and Expected Annual Revenue Loss by U.S. State", 
+       subtitle = "weighted mean averages across county by population size",
+       x = NULL, 
+       y = NULL)
+```
+
+

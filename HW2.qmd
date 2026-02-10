@@ -58,7 +58,7 @@ nri_norm <- nri %>%
   group_by(state_name_abbreviation) %>% 
   summarise(
     mean_nri = weighted.mean(national_risk_index_score_composite, population_2020, na.rm = TRUE),
-    mean_loss = weighted.mean(expected_annual_loss_total_composite, population_2020, na.rm = TRUE)
+    loss_total = sum(expected_annual_loss_total_composite, population_2020, na.rm = TRUE)
   ) 
 
 # Create another column plot
@@ -88,14 +88,14 @@ ggplot(nri_norm, aes(
   # Column height is determined by weighted mean NRI
   y = mean_nri,
   # Fill values by the weighted average of loss by county
-  fill = mean_loss
+  fill = loss_total
 )) +
   # Use column plot
-  geom_col() +
+  geom_col(color = "black") +
   # Make axis radial- adjust inner radius
   coord_radial(inner.radius = 0.2, expand = FALSE) +  
   # Fill colors and adjust color bar title and labels
-  scale_fill_viridis_c(option = "magma",
+  scale_fill_viridis_c(option = "inferno", direction = -1,
                        labels = scales::label_dollar(scale_cut = scales::cut_short_scale())
                        ) +
   theme_minimal() +
@@ -110,25 +110,33 @@ ggplot(nri_norm, aes(
     
     # Adjust title position
       plot.title = element_text(hjust = 0.5),
-  plot.subtitle = element_text(hjust = 0.5)
+  plot.subtitle = element_text(hjust = 0.5), 
+  plot.caption = element_text(hjust = 0.5, 
+                              size = 9)
   ) +
-  guides(fill = guide_colorbar(title = "Average Annual Loss", 
-                               barwidth = 1, 
-                               barheight = 15))+
-  # Add plot labels
-  labs(title = "National Risk Index (NRI) and Expected Annual Revenue Loss by U.S. State", 
-       subtitle = "weighted mean averages across county by population size",
+  # Adjust colorbar
+  guides(fill = guide_colorbar(title = "Total Annual Loss (USD)", 
+                               title.position = "top", 
+                               title.hjust = 0.5, 
+                               barwidth = 15, 
+                               barheight = 0.75, 
+                               position = "bottom"))+
+  # Add plot labels, caption, and alt text
+  labs(title = "Relative National Risk Index (NRI) and Annual Revenue Loss by U.S. State", 
+       subtitle = "Highest NRI and expected total revenue loss in California ",
        x = NULL, 
-       y = NULL)
+       y = NULL, 
+       caption = "Data: FEMA Resilience Analysis and Planning Tool (RAPT) National Risk Index (NRI) (2025 Release).", 
+       alt = "Radial bar plot dislaying the relative National Risk Index (NRI) by bar height for U.S. states, colored by total expected annual revenue loss with darker colors representing higher annual loss ($0-$30B). California has the highest bar and darkest color.")
 ```
 
 ## Written response
 
 1. What are your variables of interest and what kinds of data (e.g. numeric, categorical, ordered, etc.) are they (a bullet point list is fine)?
 
-- State name
+- State name (categorical)
 - NRI composite score (numeric)
-- Annual average loss (numeric)
+- Total expected annual loss (numeric)
 
 2. How did you decide which type of graphic form was best suited for answering the question? What alternative graphic forms could you have used instead? Why did you settle on this particular graphic form?
 

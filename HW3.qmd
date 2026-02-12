@@ -130,7 +130,7 @@ perc_risk_cat <- perc_risk_cat %>%
   )
 ```
 
-```{r}
+```{r, fig.height=8, fig.width = 10}
 ggplot(data = perc_risk_cat,
   aes(
     x = label,

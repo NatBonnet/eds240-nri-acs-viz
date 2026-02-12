@@ -202,7 +202,7 @@ I wanted to directly compare proportions across groups so a flipped proportional
 All race/ethnicity groups in California experience mostly "Very High" risk of impact from natural hazards, followed by "Relatively High", and "Moderate". The most high risk group was "Asian", with Pacific Islanders/ Native Hawaiians experiencing the least "Very High" risk, but the most "Relatively High" risk. 
 
 4. What modifications did you make to this visualization to make it more easily readable?
-
+The main way I tried to make the visual more readable was by reordering the categorical variables as factors so that readers could clearly visualize high risk in a logical order and not have too much eye movement to interpret the order of the legend. I also decided to flip the axes so that readers wouldn't have to turn their heads to read the numeric scale. 
 5. Is there anything you wanted to implement, but didn’t know how? If so, please describe.
-
+Not particularly, I was able to access resources to complete the visual I had in mind fairly easily because it wasn't a nontraditional style of plot.
 

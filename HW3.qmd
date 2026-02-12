@@ -192,11 +192,14 @@ ggplot(data = perc_risk_cat,
 
 1. What are your variables of interest and what kinds of data (e.g. numeric, categorical, ordered, etc.) are they (a bullet point list is fine)?
 
-In this visualization, I was interested in 
+In this visualization, I was interested in understanding what proportion of each race/ethnicity group defined by ACS fell under each category of NRI risk rating category. I used the categorical 'label' variable from ACS and 'national_risk_index_rating_composite' variable from FEMA NRI, and calculated the proportion (numeric) of each group in each NRI category. 
 
 2. How did you decide which type of graphic form was best suited for answering the question? What alternative graphic forms could you have used instead? Why did you settle on this particular graphic form?
 
+I wanted to directly compare proportions across groups so a flipped proportional bar plot made sense to do this without visual strain. I thought about using donut plots or a scatter plot by county, but thought those would be too hard to interpret  or too much information for one graph. There is already a lot to take in between 3 variables, so throwing in more elements seemed like a bad choice. 
+
 3. Summarize your main finding in no more than two sentences.
+All race/ethnicity groups in California experience mostly "Very High" risk of impact from natural hazards, followed by "Relatively High", and "Moderate". The most high risk group was "Asian", with Pacific Islanders/ Native Hawaiians experiencing the least "Very High" risk, but the most "Relatively High" risk. 
 
 4. What modifications did you make to this visualization to make it more easily readable?
 
